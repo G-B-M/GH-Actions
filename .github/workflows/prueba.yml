@@ -1,0 +1,21 @@
+name: 'Name of action'
+on:
+  push:
+    branches:
+      - feature/github-actions-course
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          node-version: '20'
+      - name: Print branch
+        run: |
+          # Obtener el nombre de la rama desde la variable de entorno GITHUB_REF
+          branchName=$(basename "${GITHUB_REF}")
+
+          # Imprimir el nombre de la rama en el registro de ejecución
+          echo "Commit realizado en la rama: $branchName"
