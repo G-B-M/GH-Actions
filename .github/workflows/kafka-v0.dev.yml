@@ -1,0 +1,1054 @@
+openapi: 3.0.3
+info:
+  title: Kafka as a Service API
+  description: Kafka as a Service API
+  version: 0.0.5
+  contact:
+    name: IONOS Cloud Support
+    url: https://docs.ionos.com/support/general-information/contact-information
+    email: support@cloud.ionos.com
+
+externalDocs:
+  url: https://api.ionos.com/docs/cloud/
+  description: IONOS Cloud - API documentation
+
+security:
+  - ionosToken: []
+
+servers:
+  - url: '{baseUrl}'
+    description: IONOS Cloud Kafka as a Service API
+    variables:
+      baseUrl:
+        description: The baseUrl for each environment to use
+        enum:
+          - https://dev.kafka.de-fra.ionos.com
+          - https://qa.kafka.de-fra.ionos.com
+          - https://pre.kafka.de-fra.ionos.com
+        default: https://dev.kafka.de-fra.ionos.com
+
+tags:
+  - name: Kafka
+    description: |
+      All endpoints to CRUD Kafka clusters.
+  - name: KafkaInfo
+    description: |
+      Metadata about the API such as supported versions.
+
+paths:
+  /clusters:
+    get:
+      summary: List the Kafka clusters
+      description: |
+        List all Kafka clusters that can be accessed by the user.
+        The user might filter the request for the name or state of the Kafka cluster.
+        If no cluster is available matching the request, the list will be empty.
+      operationId: clustersGet
+      parameters:
+        - name: filter.name
+          in: query
+          required: false
+          description: Only return Kafka clusters that contain the given name. Case insensitive.
+          schema:
+            $ref: "#/components/schemas/KafkaClusterName"
+        - name: filter.state
+          in: query
+          required: false
+          description: Only return Kafka clusters with a given state.
+          schema:
+            $ref: "#/components/schemas/ResourceState"
+      tags:
+        - Kafka
+      responses:
+        '200':
+          $ref: "#/components/responses/KafkaListResponse"
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: '#/components/responses/InternalError'
+        default:
+          $ref: "#/components/responses/UnhandledResponse"
+
+    post:
+      summary: Create a Kafka cluster
+      description: |
+        Create a new Kafka cluster.
+        The cluster will be deployed in the location matching the provided location.
+      operationId: clustersPost
+      tags:
+        - Kafka
+      requestBody:
+        $ref: "#/components/requestBodies/KafkaPostRequestBody"
+      responses:
+        '200':
+          $ref: "#/components/responses/KafkaPostResponse"
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: '#/components/responses/InternalError'
+        default:
+          $ref: "#/components/responses/UnhandledResponse"
+
+  /clusters/{clusterId}:
+    parameters:
+      - $ref: "#/components/parameters/clusterId"
+    put:
+      summary: Create or update a Kafka cluster
+      description: Update an exiting Kafka cluster or create a new one.
+      operationId: clustersPut
+      tags:
+        - Kafka
+      parameters:
+        - $ref: "#/components/parameters/IfMatch"
+      requestBody:
+        $ref: "#/components/requestBodies/KafkaPutRequestBody"
+      responses:
+        '200':
+          $ref: "#/components/responses/KafkaPutResponse"
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: '#/components/responses/InternalError'
+        default:
+          $ref: "#/components/responses/UnhandledResponse"
+
+    get:
+      summary: Retrieve a Kafka cluster
+      description: Retrieve the specified Kafka cluster by its distinct ID.
+      operationId: clustersFindById
+      tags:
+        - Kafka
+      responses:
+        '200':
+          $ref: "#/components/responses/KafkaFindByIdResponse"
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: '#/components/responses/InternalError'
+        default:
+          $ref: "#/components/responses/UnhandledResponse"
+
+    delete:
+      summary: Delete a Kafka cluster
+      description: Delete the specified Kafka cluster by its distinct ID.
+      operationId: clustersDelete
+      tags:
+        - Kafka
+      responses:
+        '200':
+          $ref: "#/components/responses/KafkaDeleteResponse"
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: '#/components/responses/InternalError'
+        default:
+          $ref: "#/components/responses/UnhandledResponse"
+
+  /clusters/{clusterId}/users:
+    parameters:
+      - $ref: "#/components/parameters/clusterId"
+    get:
+      summary: List the Kafka cluster users
+      description: List all Kafka cluster users on your Kafka cluster.
+      operationId: clustersUsersGet
+      tags:
+        - Kafka
+      responses:
+        '200':
+          $ref: "#/components/responses/UserListResponse"
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: '#/components/responses/InternalError'
+        default:
+          $ref: "#/components/responses/UnhandledResponse"
+
+  /clusters/{clusterId}/users/{userId}/access:
+    parameters:
+      - $ref: "#/components/parameters/clusterId"
+      - $ref: "#/components/parameters/userId"
+    get:
+      summary: Get access files for Kafka cluster user
+      description: Get the Kafka cluster certificate, the SSL key, and the SSL certificate.
+      operationId: clustersUsersAccessGet
+      tags:
+        - Kafka
+      responses:
+        '200':
+          $ref: "#/components/responses/KafkaUserAccessGetResponse"
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          $ref: '#/components/responses/Forbidden'
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: '#/components/responses/InternalError'
+        default:
+          $ref: "#/components/responses/UnhandledResponse"
+
+  # ------------------------------------------ Versions ------------------------------------------
+  /versions:
+    get:
+      summary: List the available Kafka versions
+      description: Retrieve all available versions of Kafka.
+      operationId: versionsGet
+      tags:
+        - KafkaInfo
+      responses:
+        "200":
+          $ref: '#/components/responses/VersionList'
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: '#/components/responses/InternalError'
+        default:
+          $ref: "#/components/responses/UnhandledResponse"
+
+# ------------------------------------------ Components ------------------------------------------
+components:
+  # ------------------------------------------ Headers ------------------------------------------
+  headers:
+    ETag:
+      description: |
+        The [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110.html#name-etag)
+        ETag header field in a response provides the current entity tag
+        for the selected resource. An entity tag is an opaque identifier for
+        different versions of a resource over time, regardless whether multiple
+        versions are valid at the same time. An entity tag consists of an opaque
+        quoted string, possibly prefixed by a weakness indicator.
+      schema:
+        $ref: "#/components/schemas/ETag"
+    X-RateLimit-Limit:
+      description: The number of allowed requests in the current period.
+      schema:
+        type: integer
+    X-RateLimit-Remaining:
+      description: The number of remaining requests in the current period.
+      schema:
+        type: integer
+    X-RateLimit-Reset:
+      description: The number of seconds left in the current period.
+      schema:
+        type: integer
+
+  # ------------------------------------------ Parameters & request headers ------------------------------------------
+  parameters:
+    clusterId:
+      description: |
+        The unique ID of the Kafka cluster. It must conform to the UUID format.
+      in: path
+      name: clusterId
+      required: true
+      schema:
+        $ref: "#/components/schemas/ResourceId"
+
+    IfMatch:
+      name: If-Match
+      in: header
+      required: false
+      description: |
+        The ETag of the Kafka cluster. If the ETag matches the ETag of the
+        Kafka cluster, the Kafka cluster will be updated. If the ETag does
+        not match the ETag of the Kafka cluster, a `412 Precondition Failed`
+        error will be returned.
+      schema:
+        $ref: "#/components/schemas/ETag"
+
+    userId:
+      description: |
+        The unique ID of the Kafka cluster user. It must conform to the UUID format.
+      in: path
+      name: userId
+      required: true
+      schema:
+        $ref: "#/components/schemas/ResourceId"
+
+  # ------------------------------------------ Request bodies ------------------------------------------
+  requestBodies:
+    KafkaPostRequestBody:
+      description: Post Kafka request body.
+      content:
+        'application/json':
+          schema:
+            $ref: "#/components/schemas/KafkaPostRequestBodyData"
+      required: true
+
+    KafkaPutRequestBody:
+      description: Put Kafka request body.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/KafkaPutRequestBodyData"
+
+  # ------------------------------------------ Responses ------------------------------------------
+  responses:
+    BadRequest:
+      description: |
+        ### Bad Request
+        The request send to the API was malformed.
+      headers:
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Unauthorized:
+      description: |
+        ### Unauthorized
+        The request is missing authorization information or the authorization information provided are expired.
+      headers:
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+        WWW_Authenticate:
+          description: |
+            The HTTP WWW-Authenticate response header defines the HTTP authentication methods ("challenges")
+            that might be used to gain access to a specific resource.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Forbidden:
+      description: |
+        ### Not Allowed
+        The user issuing the request does not have the needed permissions.
+      headers:
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: |
+        ### Not Found
+        The requested resource could not be found.
+      headers:
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    InternalError:
+      description: |
+        ### Internal Server Error
+        An internal error occurred. We apologize for the inconvenience!
+      headers:
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    TooManyRequests:
+      description: |
+        ### Too Many Requests
+        The user has sent too many requests in a given amount of time ("rate limiting").
+      headers:
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    UnprocessableEntity:
+      description: |
+        ### Unprocessable Entity
+        The client input cannot be validated.
+      headers:
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    UnhandledResponse:
+      description: Default response. Unexpected error.
+      headers:
+        ETag:
+          $ref: '#/components/headers/ETag'
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    KafkaUserAccessGetResponse:
+      description: Return the client certificates, and the key and the certificate for the SSL authentication.
+      headers:
+        ETag:
+          $ref: '#/components/headers/ETag'
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/UserAccessGetResponseData"
+
+    KafkaDeleteResponse:
+      description: Successful deletion.
+      headers:
+        ETag:
+          $ref: '#/components/headers/ETag'
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+
+    KafkaFindByIdResponse:
+      description: Response for a successful get Kafka cluster by ID request.
+      headers:
+        ETag:
+          $ref: '#/components/headers/ETag'
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/KafkaClusterByIdResponseData"
+
+    KafkaListResponse:
+      description: List all Kafka clusters.
+      headers:
+        ETag:
+          $ref: '#/components/headers/ETag'
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/KafkaListResponseData"
+
+    KafkaPostResponse:
+      description: Response for a successful Kafka cluster creation request.
+      headers:
+        ETag:
+          $ref: '#/components/headers/ETag'
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/KafkaPostPutResponseData"
+
+    KafkaPutResponse:
+      description: Response for a successful Kafka cluster update request.
+      headers:
+        ETag:
+          $ref: '#/components/headers/ETag'
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/KafkaPostPutResponseData"
+
+    UserListResponse:
+      description: List all users of a Kafka cluster.
+      headers:
+        ETag:
+          $ref: '#/components/headers/ETag'
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/UserListResponseData"
+
+    VersionList:
+      description: |
+        List of all supported platform versions.
+      headers:
+        ETag:
+          $ref: '#/components/headers/ETag'
+        X-RateLimit-Limit:
+          $ref: '#/components/headers/X-RateLimit-Limit'
+        X-RateLimit-Remaining:
+          $ref: '#/components/headers/X-RateLimit-Remaining'
+        X-RateLimit-Reset:
+          $ref: '#/components/headers/X-RateLimit-Reset'
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/KafkaVersionResponseData"
+
+  # ------------------------------------------ Schemas ------------------------------------------
+  schemas:
+    CACertificate:
+      type: string
+      additionalProperties: false
+      description: Schema of the certificate authority.
+
+    SSLCertificate:
+      type: string
+      additionalProperties: false
+      description: Schema of the SSL certificate.
+
+    SSLKey:
+      type: string
+      additionalProperties: false
+      description: Schema of the SSL key.
+
+    Error:
+      description: Schema for all error responses.
+      type: object
+      additionalProperties: false
+      required:
+        - httpStatus
+        - messages
+      properties:
+        httpStatus:
+          type: integer
+          description: |
+            HTTP status code of the operation as specified by [RFC 7231](https://datatracker.ietf.org/doc/html/rfc7231#section-6).
+          example: 400
+        messages:
+          type: array
+          description: |
+            List of error messages.
+          items:
+            $ref: "#/components/schemas/ErrorMessage"
+
+    ErrorMessage:
+      description: Schema for an error message containing an error code and a text message.
+      type: object
+      additionalProperties: false
+      required:
+        - errorCode
+        - message
+      properties:
+        errorCode:
+          type: string
+          description: |
+            Internal error code.
+          example: "kaas-rest-0123"
+        message:
+          type: string
+          description: |
+            Human readable explanation of the issue.
+          example: "example error message"
+
+    ETag:
+      description: |
+        The [RFC 7232](https://www.rfc-editor.org/rfc/rfc7232.html#name-etag)
+        ETag header field in a response provides the current entity tag
+        for the selected representation, as determined at the conclusion
+        of handling the request. An entity tag is an opaque validator for
+        differentiating between multiple representations of the same
+        resource, regardless of whether those multiple representations are
+        due to resource state changes over time, content negotiation
+        resulting in multiple representations being valid at the same time,
+        or both. An entity tag consists of an opaque quoted string, possibly
+        prefixed by a weakness indicator.
+      type: string
+      example: "7da7a728-f910-11e6-942a-68f728c1ba70"
+
+    KafkaCluster:
+      type: object
+      description: Kafka cluster basic properties.
+      additionalProperties: false
+      properties:
+        name:
+          $ref: "#/components/schemas/KafkaClusterName"
+        version:
+          $ref: "#/components/schemas/KafkaVersion"
+        size:
+          $ref: "#/components/schemas/KafkaClusterSize"
+      required:
+        - name
+        - version
+        - size
+
+    KafkaClusterBrokerAddress:
+      type: string
+      description: Broker address schema of a Kafka cluster.
+      example: 127.0.0.1:9094
+
+    # /Get
+    # Response Data with Kafka cluster addresses
+    KafkaClusterByIdResponseData:
+      description: Response data for a get unique cluster request, containing the broker and server addresses.
+      allOf:
+        - $ref: "#/components/schemas/KafkaClusterCommonData"
+        - type: object
+          additionalProperties: false
+          required:
+            - properties
+            - metadata
+          properties:
+            metadata:
+              $ref: "#/components/schemas/KafkaClusterByIdMetadata"
+            properties:
+              $ref: "#/components/schemas/KafkaCluster"
+
+    KafkaClusterCommonData:
+      type: object
+      description: Response data schema that is common every time a Kafka cluster is returned single or listed.
+        Containing the resource ID, the type description, and a reference to the specific cluster.
+        It does not contain metadata.
+      additionalProperties: false
+      required:
+        - id
+      properties:
+        id:
+          $ref: "#/components/schemas/ResourceId"
+        type:
+          type: string
+          example: "kafkaCluster"
+        href:
+          type: string
+          description: URL to the object representation (absolute path).
+          example: https://[..]/kafka/498ae72f-411f-11eb-9d07-046c59cc737e
+
+    KafkaClusterList:
+      type: array
+      description: Array of Kafka clusters.
+      required:
+        - items
+      additionalProperties: false
+      items:
+        $ref: "#/components/schemas/KafkaClusterByIdResponseData"
+
+    KafkaClusterListMetadata:
+      type: object
+      required:
+        - complete
+        - totalCount
+      properties:
+        complete:
+          type: boolean
+          description: True if all locations could be reached and all Kafka clusters are returned.
+        totalCount:
+          type: integer
+          description: Total number of returned Kafka clusters.
+
+    KafkaClusterName:
+      type: string
+      description: |
+        The name of your Kafka cluster.
+        Must be 63 characters or less and must begin and end with an alphanumeric character (`[a-z0-9A-Z]`)
+        with dashes (`-`), underscores (`_`), dots (`.`), and alphanumerics between.
+      pattern: '^[A-Za-z0-9][-A-Za-z0-9_.]*[A-Za-z0-9]$'
+      minLength: 2
+      maxLength: 63
+      example: my-kafka-cluster
+
+    KafkaClusterSize:
+      type: string
+      description: |
+        The size of your Kafka cluster.
+        The size of the Kafka cluster is given in T-shirt sizes. Valid values are: "S"
+      pattern: '^[S]$'
+      example: "S"
+
+    KafkaListResponseData:
+      description: Response data of get clusters request.
+      allOf:
+        - $ref: "#/components/schemas/ListCommonData"
+        - type: object
+          required:
+            - metadata
+            - items
+          properties:
+            metadata:
+              $ref: "#/components/schemas/KafkaClusterListMetadata"
+            items:
+              $ref: "#/components/schemas/KafkaClusterList"
+
+    KafkaPostRequestBodyData:
+      description: Schema of post request body.
+      type: object
+      additionalProperties: false
+      required:
+        - properties
+      properties:
+        properties:
+          $ref: "#/components/schemas/KafkaCluster"
+
+    KafkaPostPutResponseData:
+      description: Response data of post, delete, and put request. It does not contain broker and server addresses.
+      allOf:
+        - $ref: "#/components/schemas/KafkaClusterCommonData"
+        - type: object
+          additionalProperties: false
+          required:
+            - properties
+            - metadata
+          properties:
+            metadata:
+              $ref: "#/components/schemas/ResourceMetadata"
+            properties:
+              $ref: "#/components/schemas/KafkaCluster"
+
+    KafkaPutRequestBodyData:
+      description: Schema of put request body.
+      type: object
+      additionalProperties: false
+      required:
+        - properties
+      properties:
+        properties:
+          $ref: "#/components/schemas/KafkaCluster"
+
+    KafkaVersionResponseData:
+      description: Response data of get versions request.
+      allOf:
+        - $ref: "#/components/schemas/ListCommonData"
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              additionalProperties: false
+              items:
+                $ref: "#/components/schemas/KafkaVersionObject"
+
+    KafkaVersion:
+      type: string
+      pattern: '^3.5.1$'
+      maxLength: 32
+      description: |
+        The version of Kafka. Currently only Kafka Version 3.5.1 is supported.
+      example: 3.5.1
+
+    KafkaVersionObject:
+      type: object
+      description: |
+        The version of Kafka.
+      required:
+        - name
+      properties:
+        name:
+          $ref: "#/components/schemas/KafkaVersion"
+
+    ListCommonData:
+      description: Data schema that is common in every list response body.
+      type: object
+      properties:
+        id:
+          type: string
+          example: "managedKafka/clusters"
+        type:
+          type: string
+          enum:
+            - collection
+        href:
+          type: string
+          format: uri
+          readOnly: true
+
+    ResourceMetadata:
+      type: object
+      description: Metadata of Kubernetes resources.
+      properties:
+        etag:
+          $ref: "#/components/schemas/ETag"
+        createdDate:
+          type: string
+          readOnly: true
+          format: date-time
+          example: 2022-08-21T15:52:53Z
+          description: The date of creation of the zone formatted as `yyyy-MM-ddTHH:mm:ss.fffZ`.
+        createdBy:
+          type: string
+          description: The user that created the resource.
+          example: john.doe@example.com
+        lastModifiedDate:
+          type: string
+          readOnly: true
+          format: date-time
+          example: 2022-08-21T15:52:53Z
+          description: The date of the last change formatted as `yyyy-MM-ddTHH:mm:ss.fffZ`.
+        createdByUserId:
+          type: string
+          description: The ID of the user that created the resource.
+          example: 12345693-9ae1-40c5-9b49-7c0afeabcdef
+        state:
+          $ref: "#/components/schemas/ResourceState"
+
+    KafkaClusterByIdMetadata:
+      description: Metadata of a Kafka cluster including server address and broker addresses.
+      allOf:
+        - $ref: "#/components/schemas/ResourceMetadata"
+        - type: object
+          properties:
+            serverAddress:
+              type: string
+              description: Server address of the Kafka cluster.
+            brokerAddresses:
+              type: array
+              description: Array of broker addresses of the Kafka cluster.
+              items:
+                $ref: "#/components/schemas/KafkaClusterBrokerAddress"
+
+    ResourceId:
+      type: string
+      format: uuid
+      pattern: '^[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}$'
+      minLength: 32
+      maxLength: 36
+      description: |
+        The unique ID of the resource. It must conform to the UUID format.
+      example: "498ae72f-411f-11eb-9d07-046c59cc737e"
+
+    ResourceState:
+      type: string
+      description: |
+        State of the resource. Resource states:
+        `AVAILABLE`: There are no pending modification requests for this item.
+        `BUSY`: There is at least one modification request pending and all following requests will be queued.
+        `DEPLOYING`: The resource is being created.
+        `FAILED`: The creation of the resource failed.
+        `UPDATING`: The resource is being updated.
+        `FAILED_UPDATING`: An update to the resource was not successful.
+      x-extensible-enum:
+        - AVAILABLE
+        - BUSY
+        - DEPLOYING
+        - FAILED
+        - UPDATING
+        - FAILED_UPDATING
+      example: "AVAILABLE"
+
+    UserAccessGetResponseData:
+      description: Response data of get user access request.
+      allOf:
+        - $ref: "#/components/schemas/UserCommonData"
+        - type: object
+          additionalProperties: false
+          required:
+            - metadata
+            - properties
+          properties:
+            metadata:
+              $ref: "#/components/schemas/UserAccessMetadata"
+            properties:
+              $ref: "#/components/schemas/KafkaClusterUser"
+
+    UserAccessMetadata:
+      allOf:
+        - $ref: "#/components/schemas/ResourceMetadata"
+        - type: object
+          additionalProperties: false
+          properties:
+            clusterCA:
+              $ref: "#/components/schemas/CACertificate"
+            sslKey:
+              $ref: "#/components/schemas/SSLKey"
+            sslCertificate:
+              $ref: "#/components/schemas/SSLCertificate"
+
+    UserCommonData:
+      type: object
+      description: Response data schema that is common every time a Kafka cluster user is returned single or listed.
+        Containing the resource ID and the type description.
+        It does not contain metadata.
+      additionalProperties: false
+      required:
+        - id
+      properties:
+        id:
+          $ref: "#/components/schemas/ResourceId"
+        type:
+          type: string
+          example: "kafkaClusterUser"
+        href:
+          type: string
+          description: URL to the object representation (absolute path).
+          example: https://[..]/clusters/498ae72f-411f-11eb-9d07-046c59cc737e/users/498ae72f-411f-11eb-9d07-046c59cc737e
+
+    UserList:
+      type: array
+      description: Array of Kafka cluster users.
+      required:
+        - items
+      additionalProperties: false
+      items:
+        $ref: "#/components/schemas/UserResponseData"
+
+    UserListResponseData:
+      description: Response data of get cluster users request.
+      allOf:
+        - $ref: "#/components/schemas/ListCommonData"
+        - type: object
+          required:
+            - metadata
+          properties:
+            metadata:
+              type: object
+              properties:
+                totalCount:
+                  type: integer
+                  description: Total number of Kafka cluster users.
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              $ref: "#/components/schemas/UserList"
+
+    UserResponseData:
+      description: Response data of Kafka cluster user post request and get users. It does not contain certificates.
+      allOf:
+        - $ref: "#/components/schemas/UserCommonData"
+        - type: object
+          additionalProperties: false
+          required:
+            - metadata
+            - properties
+          properties:
+            metadata:
+              $ref: "#/components/schemas/ResourceMetadata"
+            properties:
+              $ref: "#/components/schemas/KafkaClusterUser"
+
+    KafkaClusterUser:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: |
+            The name of the Kafka cluster user.
+            Must be 63 characters or less and must begin and end with an alphanumeric character (`[a-z0-9A-Z]`)
+            with dashes (`-`), underscores (`_`), dots (`.`), and alphanumerics between.
+          pattern: '^[A-Za-z0-9][-A-Za-z0-9_.]*[A-Za-z0-9]$'
+          minLength: 2
+          maxLength: 63
+          example: my-kafka-cluster-user
+
+  # ------------------------------------------ Security schemes ------------------------------------------
+  securitySchemes:
+    ionosToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        The Bearer auth token used at the API Gateway is a user-related token created with the IONOS Cloud CLI
+        (For details, see the
+        [documentation](https://docs.ionos.com/cli-ionosctl/subcommands/authentication/token/generate)).
+        For every request to be authenticated, the token is passed as *Authorization Bearer* header along with the request.
