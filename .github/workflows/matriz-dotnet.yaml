@@ -3,7 +3,7 @@ name: Matriz de configuraciones y versión de .NET
 on:
   push:
     branches: ["main"]
-  pulll_request:
+  pull_request:
     branches: ["main"]
 
 jobs:
@@ -22,5 +22,5 @@ jobs:
         include-prerelease: true
     - name: Restore dependencies
       run: dotnet restore src/wpm-api/WisdomPetMedicine.sln
-     - name: Build
+    - name: Build
       run: dotnet restore src/wpm-api/WisdomPetMedicine.sln --configuration ${{ matrix.dotnetversion }} --no-restore
