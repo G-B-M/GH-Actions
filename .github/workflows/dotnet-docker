@@ -1,0 +1,28 @@
+name: .NET con Docker
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        run: actions/setup-dotnet@v2
+        with:
+            donet-version: 6.0.x
+      - name: Restore dependencies
+        run: |dotnet restore src/wpm-api/WisdomPetMedicine.sln
+
+    docker:
+      name: Contenerización con Docker y .NET
+      runs-on: ubutnu-latest
+      steps:
+      - name: docker build
+        run: docker build src/wpm-api --file src/wpm-api/WisdomPetMedicime.Api/Dockerfile --tag github-action-esencial
