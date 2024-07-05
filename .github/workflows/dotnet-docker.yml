@@ -20,10 +20,10 @@ jobs:
       - name: Restore dependencies
         #run: |dotnet restore src/wpm-api/WisdomPetMedicine.sln
 
-    docker:
-      name: Contenerización con Docker y .NET
-      runs-on: ubutnu-latest
-      needs: [build]
-      steps:
+  docker:
+    name: Contenerización con Docker y .NET
+    runs-on: ubutnu-latest
+    needs: [build]
+    steps:
       - name: docker build
         #run: docker build src/wpm-api --file src/wpm-api/WisdomPetMedicime.Api/Dockerfile --tag github-action-esencial
