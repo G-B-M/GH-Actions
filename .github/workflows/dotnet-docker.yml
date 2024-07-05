@@ -23,6 +23,7 @@ jobs:
     docker:
       name: Contenerización con Docker y .NET
       runs-on: ubutnu-latest
+      needs: [build]
       steps:
       - name: docker build
         #run: docker build src/wpm-api --file src/wpm-api/WisdomPetMedicime.Api/Dockerfile --tag github-action-esencial
