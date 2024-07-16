@@ -18,7 +18,7 @@ jobs:
         with:
             donet-version: 6.0.x
       - name: Restore dependencies
-        #run: |dotnet restore src/wpm-api/WisdomPetMedicine.sln
+        #run: |dotnet restore src/wpm-api/WisdomPetMedicine.sln 
 
   docker:
     name: Contenerización con Docker y .NET
